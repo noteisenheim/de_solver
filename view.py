@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 import matplotlib
+
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -14,7 +15,8 @@ from model import *
 class Controller:
     def __init__(self):
         self.view = View()
-        self.calculate_button = tk.Button(self.view.init, text='calculate', command=self.on_calc_button_click, state='normal')
+        self.calculate_button = tk.Button(self.view.init, text='calculate', command=self.on_calc_button_click,
+                                          state='normal')
         self.calculate_button.grid(row=10, column=11)
         self.view.init.mainloop()
 
@@ -76,15 +78,17 @@ class Controller:
 
         deriv_function = MyFunction()
         self.subplot_num = 2
+        if (le):
+            self.subplot_num += 1
+        if (ge):
+            self.subplot_num += 1
         # euler method if chosen
         if (em):
             self.euler_method = EulerMethod(self.grid, deriv_function)
             self.euler_method.solve()
             if (le):
-                self.subplot_num += 1
                 self.euler_method.local_error(self.exact_solution)
             if (ge):
-                self.subplot_num += 1
                 self.euler_method.global_error(self.exact_solution)
         # improved euler method if chosen
         if (iem):
@@ -130,7 +134,7 @@ class Controller:
                 t_le = np.amax(np.absolute(np.array(temp_rkm.le)))
                 self.rkm_total_error.append(t_le)
 
-        #displaying plots
+        # displaying plots
         self.figure = plt.Figure(figsize=(6, 8), dpi=90)
         if (le):
             self.le_plot = self.figure.add_subplot(self.subplot_num, 1, 2)
@@ -142,6 +146,7 @@ class Controller:
                 self.ge_plot = self.figure.add_subplot(self.subplot_num, 1, 2)
             self.ge_plot.set_title("global errors", fontsize='x-small')
         self.te_plot = self.figure.add_subplot(self.subplot_num, 1, self.subplot_num)
+        self.te_plot.set_title("total errors", fontsize='x-small')
         self.plot_exact_solution()
         if (em):
             self.plot_euler()
@@ -164,14 +169,14 @@ class Controller:
                 self.plot_runge_kutta_le()
             if (ge):
                 self.plot_runge_kutta_ge()
-        #displaying legends
+        # displaying legends
         self.graph_plot.legend(loc='best', fontsize='xx-small')
         self.te_plot.legend(loc='best', fontsize='xx-small')
         if (le):
             self.le_plot.legend(loc='best', fontsize='xx-small')
         if (ge):
             self.ge_plot.legend(loc='best', fontsize='xx-small')
-        #changing font sizes
+        # changing font sizes
         for label in (self.graph_plot.get_xticklabels() + self.graph_plot.get_yticklabels()):
             label.set_fontsize('x-small')
         for label in (self.te_plot.get_xticklabels() + self.te_plot.get_yticklabels()):
@@ -182,16 +187,17 @@ class Controller:
         if (ge):
             for label in (self.ge_plot.get_xticklabels() + self.ge_plot.get_yticklabels()):
                 label.set_fontsize('x-small')
-        #outputting graphs
+        # outputting graphs
+        self.figure.subplots_adjust(top=0.9, bottom=0.1, hspace=0.5)
         self.canvas = FigureCanvasTkAgg(self.figure, self.view.init)
-        self.canvas.get_tk_widget().grid(row=0, column=3, rowspan=15, columnspan=8,  sticky="WENS")
+        self.canvas.get_tk_widget().grid(row=0, column=3, rowspan=15, columnspan=8, sticky="WENS")
 
     def plot_exact_solution(self):
         y = self.exact_solution.y
         x = self.grid.x
         self.graph_plot = self.figure.add_subplot(self.subplot_num, 1, 1)
         self.graph_plot.set_title('graphs', fontsize='x-small')
-        self.graph_plot.plot(x, y, label='exact solution',)
+        self.graph_plot.plot(x, y, label='exact solution', )
 
     def plot_euler(self):
         y = self.euler_method.y
